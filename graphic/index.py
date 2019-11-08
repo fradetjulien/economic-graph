@@ -3,6 +3,7 @@ import numpy as np
 import click
 import csv
 
+# Check if the file received in parameter is a correct CSV file
 def isCSV(file):
     if not file.endswith('.csv'):
         print("Insert a correct CSV file please.")
@@ -17,6 +18,7 @@ def isCSV(file):
             return False
     return
 
+# Define the lowest and highest value, store all value
 def setRanges(item, value, ranges):
     if item.isdecimal():
         ranges[value]["all"].append(int(item))
@@ -30,12 +32,14 @@ def setRanges(item, value, ranges):
             ranges[value]["highest"] = int(item)
     return ranges
 
+# Insert and sort data inside the dictionnary
 def fillData(row, ranges):
     ranges = setRanges(row[0], "price", ranges)
     ranges = setRanges(row[1], "quantityDemanded", ranges)
     ranges = setRanges(row[2], "quantitySupply", ranges)
     return ranges
 
+# Clean each row of any whitespace
 def cleanRow(row):
     newRow = []
     for item in row:
@@ -44,6 +48,7 @@ def cleanRow(row):
     del row
     return (newRow)
 
+# Open and read the data inside the CSV file
 def getData(file):
     ranges = {
         "price": {
@@ -69,6 +74,7 @@ def getData(file):
             ranges = fillData(row, ranges)
     return ranges
 
+# Build the final graph
 def builder(file):
     ranges = getData(file)
     plt.plot(ranges["quantityDemanded"]["all"],ranges["price"]["all"])
@@ -76,6 +82,7 @@ def builder(file):
     plt.legend(["Demand","Supply"])
     plt.ylabel("Price")
     plt.xlabel("Supply and Demand Quantity")
+    plt.suptitle("Demand and Supply schedule")
     plt.show()
     return
 
