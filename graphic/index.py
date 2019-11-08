@@ -17,7 +17,64 @@ def isCSV(file):
             return False
     return
 
-def builder():
+def setExtremeQuantity(row, ranges):
+    for item in row:
+        if item.isdecimal():
+            if ranges["quantity"]["lowest"] == None:
+                ranges["quantity"]["lowest"] = int(item)
+            if ranges["quantity"]["highest"] == None:
+                ranges["quantity"]["highest"] = int(item)
+            elif int(item) < ranges["quantity"]["lowest"]:
+                ranges["quantity"]["lowest"] = int(item)
+            elif int(item) > ranges["quantity"]["highest"]:
+                ranges["quantity"]["highest"] = int(item)
+    return ranges
+
+def setExtremePrice(price, ranges):
+    if price.isdecimal():
+        if ranges["price"]["lowest"] == None:
+            ranges["price"]["lowest"] = int(price)
+        if ranges["price"]["highest"] == None:
+            ranges["price"]["highest"] = int(price)
+        elif int(price) < ranges["price"]["lowest"]:
+            ranges["price"]["lowest"] = int(price)
+        elif int(price) > ranges["price"]["lowest"]:
+            ranges["price"]["highest"] = int(price)
+    return ranges
+
+def findExtreme(row, ranges):
+    ranges = setExtremePrice(row[0], ranges)
+    ranges = setExtremeQuantity(row[1:3], ranges)
+    return ranges
+
+def cleanRow(row):
+    newRow = []
+    for item in row:
+        item = item.strip()
+        newRow.append(item)
+    del row
+    return (newRow)
+
+def getData(file):
+    ranges = {
+        "price": {
+            "lowest": None,
+            "highest": None
+        },
+        "quantity": {
+            "lowest": None,
+            "highest": None
+        }
+    }
+    with open(file, newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
+        for row in reader:
+            row = cleanRow(row)
+            ranges = findExtreme(row, ranges)
+    return
+
+def builder(file):
+    getData(file)
     return
 
 @click.group()
