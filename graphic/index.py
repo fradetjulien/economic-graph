@@ -73,6 +73,7 @@ def builder(file):
     ranges = getData(file)
     plt.plot(ranges["quantityDemanded"]["all"],ranges["price"]["all"])
     plt.plot(ranges["quantitySupply"]["all"], ranges["price"]["all"])
+    plt.legend(["Demand","Supply"])
     plt.ylabel("Price")
     plt.xlabel("Supply and Demand Quantity")
     plt.show()
