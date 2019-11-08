@@ -18,6 +18,15 @@ def isCSV(file):
             return False
     return
 
+# Check if the row correspond to the Equilibrium Price
+def setEquilibrium(ranges, quantityDemanded, quantitySupply, price):
+    if (quantityDemanded.isdecimal() and quantitySupply.isdecimal() and price.isdecimal() and
+        (int(quantityDemanded) == int(quantitySupply))):
+        ranges["equilibriumPrice"] = price
+        ranges["equilibriumQuantity"] = quantityDemanded
+        return ranges
+    return ranges
+
 # Define the lowest and highest value, store all value
 def setRanges(item, value, ranges):
     if item.isdecimal():
@@ -37,6 +46,8 @@ def fillData(row, ranges):
     ranges = setRanges(row[0], "price", ranges)
     ranges = setRanges(row[1], "quantityDemanded", ranges)
     ranges = setRanges(row[2], "quantitySupply", ranges)
+    if ranges["equilibriumPrice"] == None:
+        ranges = setEquilibrium(ranges, row[1], row[2], row[0])
     return ranges
 
 # Clean each row of any whitespace
@@ -65,7 +76,9 @@ def getData(file):
             "lowest": None,
             "highest": None,
             "all": []
-        }
+        },
+        "equilibriumPrice": None,
+        "equilibriumQuantity": None
     }
     with open(file, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
@@ -83,6 +96,7 @@ def builder(file):
     plt.ylabel("Price")
     plt.xlabel("Supply and Demand Quantity")
     plt.suptitle("Demand and Supply schedule")
+    print("The equilibrium price is equal to {} and the equilibrium quantity is equal to {}.".format(ranges["equilibriumPrice"], ranges["equilibriumQuantity"]))
     plt.show()
     return
 
