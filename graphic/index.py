@@ -18,7 +18,7 @@ def isCSV(file):
             return False
     return
 
-# Check if the row correspond to the Equilibrium Price
+# Check if the row correspond to the Equilibrium Price and Quantity
 def setEquilibrium(ranges, quantityDemanded, quantitySupply, price):
     if (quantityDemanded.isdecimal() and quantitySupply.isdecimal() and price.isdecimal() and
         (int(quantityDemanded) == int(quantitySupply))):
@@ -41,7 +41,7 @@ def setRanges(item, value, ranges):
             ranges[value]["highest"] = int(item)
     return ranges
 
-# Insert and sort data inside the dictionnary
+# Fill and sort data inside the dictionnary
 def fillData(row, ranges):
     ranges = setRanges(row[0], "price", ranges)
     ranges = setRanges(row[1], "quantityDemanded", ranges)
@@ -87,7 +87,7 @@ def getData(file):
             ranges = fillData(row, ranges)
     return ranges
 
-# Build the final graph
+# Build the final graph and display the results
 def builder(file):
     ranges = getData(file)
     plt.plot(ranges["quantityDemanded"]["all"],ranges["price"]["all"])
