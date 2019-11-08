@@ -17,34 +17,23 @@ def isCSV(file):
             return False
     return
 
-def setExtremeQuantity(row, ranges):
-    for item in row:
-        if item.isdecimal():
-            if ranges["quantity"]["lowest"] == None:
-                ranges["quantity"]["lowest"] = int(item)
-            if ranges["quantity"]["highest"] == None:
-                ranges["quantity"]["highest"] = int(item)
-            elif int(item) < ranges["quantity"]["lowest"]:
-                ranges["quantity"]["lowest"] = int(item)
-            elif int(item) > ranges["quantity"]["highest"]:
-                ranges["quantity"]["highest"] = int(item)
+def setRanges(item, value, ranges):
+    if item.isdecimal():
+        ranges[value]["all"].append(int(item))
+        if ranges[value]["lowest"] == None:
+            ranges[value]["lowest"] = int(item)
+        if ranges[value]["highest"] == None:
+            ranges[value]["highest"] = int(item)
+        elif int(item) < ranges[value]["lowest"]:
+            ranges[value]["lowest"] = int(item)
+        elif int(item) > ranges[value]["lowest"]:
+            ranges[value]["highest"] = int(item)
     return ranges
 
-def setExtremePrice(price, ranges):
-    if price.isdecimal():
-        if ranges["price"]["lowest"] == None:
-            ranges["price"]["lowest"] = int(price)
-        if ranges["price"]["highest"] == None:
-            ranges["price"]["highest"] = int(price)
-        elif int(price) < ranges["price"]["lowest"]:
-            ranges["price"]["lowest"] = int(price)
-        elif int(price) > ranges["price"]["lowest"]:
-            ranges["price"]["highest"] = int(price)
-    return ranges
-
-def findExtreme(row, ranges):
-    ranges = setExtremePrice(row[0], ranges)
-    ranges = setExtremeQuantity(row[1:3], ranges)
+def fillData(row, ranges):
+    ranges = setRanges(row[0], "price", ranges)
+    ranges = setRanges(row[1], "quantityDemanded", ranges)
+    ranges = setRanges(row[2], "quantitySupply", ranges)
     return ranges
 
 def cleanRow(row):
@@ -59,22 +48,34 @@ def getData(file):
     ranges = {
         "price": {
             "lowest": None,
-            "highest": None
+            "highest": None,
+            "all": []
         },
-        "quantity": {
+        "quantityDemanded": {
             "lowest": None,
-            "highest": None
+            "highest": None,
+            "all": []
+        },
+        "quantitySupply": {
+            "lowest": None,
+            "highest": None,
+            "all": []
         }
     }
     with open(file, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
         for row in reader:
             row = cleanRow(row)
-            ranges = findExtreme(row, ranges)
-    return
+            ranges = fillData(row, ranges)
+    return ranges
 
 def builder(file):
-    getData(file)
+    ranges = getData(file)
+    plt.plot(ranges["quantityDemanded"]["all"],ranges["price"]["all"])
+    plt.plot(ranges["quantitySupply"]["all"], ranges["price"]["all"])
+    plt.ylabel("Price")
+    plt.xlabel("Supply and Demand Quantity")
+    plt.show()
     return
 
 @click.group()
