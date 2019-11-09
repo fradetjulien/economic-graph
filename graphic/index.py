@@ -27,28 +27,30 @@ def setEquilibrium(ranges, quantityDemanded, quantitySupply, price):
         return ranges
     return ranges
 
-# Define the lowest and highest value, store all value
-def setRanges(item, value, ranges):
+# Set the highest and lowest value for the price, quantity demanded and quantity supply
+def setMinAndMaxValues(key, data):
+    try:
+        if (data[key]["all"]):
+            data[key]["lowest"] = min(data[key]["all"])
+            data[key]["highest"] = max(data[key]["all"])
+    except:
+        return data
+    return data
+
+# Set data for each row
+def setDataByRow(item, value, data):
     if item.isdecimal():
-        ranges[value]["all"].append(int(item))
-        if ranges[value]["lowest"] == None:
-            ranges[value]["lowest"] = int(item)
-        if ranges[value]["highest"] == None:
-            ranges[value]["highest"] = int(item)
-        elif int(item) < ranges[value]["lowest"]:
-            ranges[value]["lowest"] = int(item)
-        elif int(item) > ranges[value]["lowest"]:
-            ranges[value]["highest"] = int(item)
-    return ranges
+        data[value]["all"].append(int(item))
+    return data
 
 # Fill and sort data inside the dictionnary
-def fillData(row, ranges):
-    ranges = setRanges(row[0], "price", ranges)
-    ranges = setRanges(row[1], "quantityDemanded", ranges)
-    ranges = setRanges(row[2], "quantitySupply", ranges)
-    if ranges["equilibriumPrice"] == None:
-        ranges = setEquilibrium(ranges, row[1], row[2], row[0])
-    return ranges
+def fillData(row, data):
+    keys = { "price": 0, "quantityDemanded": 1, "quantitySupply": 2 }
+    for (key, value) in keys.items():
+        data = setDataByRow(row[value], key, data)
+    if data["equilibriumPrice"] == None:
+        data = setEquilibrium(data, row[1], row[2], row[0])
+    return data
 
 # Clean each row of any whitespace
 def cleanRow(row):
@@ -59,9 +61,9 @@ def cleanRow(row):
     del row
     return (newRow)
 
-# Open and read the data inside the CSV file
-def getData(file):
-    ranges = {
+# Initialization of the dictionary which will contain all the results
+def initData():
+    data = {
         "price": {
             "lowest": None,
             "highest": None,
@@ -80,23 +82,37 @@ def getData(file):
         "equilibriumPrice": None,
         "equilibriumQuantity": None
     }
+    return (data)
+
+# Open and read the data inside the CSV file
+def getData(file):
+    data = initData()
     with open(file, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
         for row in reader:
             row = cleanRow(row)
-            ranges = fillData(row, ranges)
-    return ranges
+            data = fillData(row, data)
+    for key in data.keys():
+        data = setMinAndMaxValues(key, data)
+    return data
+
+# Display the founded results in the console
+def displayResults(data):
+    print("The equilibrium price is equal to {} and the equilibrium quantity is equal to {}.".format(data["equilibriumPrice"], data["equilibriumQuantity"]))
+    print("The minimum price is {}$ and the maximum price is {}$.".format(data["price"]["lowest"], data["price"]["highest"]))
+    print("The lowest quantity demanded is equal to {} and the highest quantity demanded is equal to {}.".format(data["quantityDemanded"]["lowest"], data["quantityDemanded"]["highest"]))
+    print("The lowest quantity supply is equal to {} and the highest quantity supply is equal to {}.".format(data["quantitySupply"]["lowest"], data["quantitySupply"]["highest"]))
 
 # Build the final graph and display the results
 def builder(file):
-    ranges = getData(file)
-    plt.plot(ranges["quantityDemanded"]["all"],ranges["price"]["all"])
-    plt.plot(ranges["quantitySupply"]["all"], ranges["price"]["all"])
+    data = getData(file)
+    plt.plot(data["quantityDemanded"]["all"],data["price"]["all"])
+    plt.plot(data["quantitySupply"]["all"], data["price"]["all"])
     plt.legend(["Demand","Supply"])
     plt.ylabel("Price")
     plt.xlabel("Supply and Demand Quantity")
     plt.suptitle("Demand and Supply schedule")
-    print("The equilibrium price is equal to {} and the equilibrium quantity is equal to {}.".format(ranges["equilibriumPrice"], ranges["equilibriumQuantity"]))
+    displayResults(data)
     plt.show()
     return
 
