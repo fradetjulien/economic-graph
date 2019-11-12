@@ -19,13 +19,13 @@ def isCSV(file):
     return
 
 # Check if the row correspond to the Equilibrium Price and Quantity
-def setEquilibrium(ranges, quantityDemanded, quantitySupply, price):
+def setEquilibrium(data, quantityDemanded, quantitySupply, price):
     if (quantityDemanded.isdecimal() and quantitySupply.isdecimal() and price.isdecimal() and
         (int(quantityDemanded) == int(quantitySupply))):
-        ranges["equilibriumPrice"] = price
-        ranges["equilibriumQuantity"] = quantityDemanded
-        return ranges
-    return ranges
+        data["equilibriumPrice"] = price
+        data["equilibriumQuantity"] = quantityDemanded
+        return data
+    return data
 
 # Set the highest and lowest value for the price, quantity demanded and quantity supply
 def setMinAndMaxValues(key, data):
@@ -50,6 +50,7 @@ def fillData(row, data):
         data = setDataByRow(row[value], key, data)
     if data["equilibriumPrice"] == None:
         data = setEquilibrium(data, row[1], row[2], row[0])
+    del keys
     return data
 
 # Clean each row of any whitespace
