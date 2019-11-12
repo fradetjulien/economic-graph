@@ -10,10 +10,10 @@ def is_CSV(file):
         return
     with open(file, newline='') as csvfile:
         try:
-            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+            csv.Sniffer().sniff(csvfile.read(1024))
             csvfile.seek(0)
             return True
-        except csv.Error as e:
+        except csv.Error:
             print("Insert a correct CSV file please.")
             return False
     return
@@ -60,7 +60,7 @@ def clean_row(row):
         item = item.strip()
         newRow.append(item)
     del row
-    return (newRow)
+    return newRow
 
 # Initialization of the dictionary which will contain all the results
 def init_data():
@@ -83,7 +83,7 @@ def init_data():
         "equilibriumPrice": None,
         "equilibriumQuantity": None
     }
-    return (data)
+    return data
 
 # Open and read the data inside the CSV file
 def get_data(file):
