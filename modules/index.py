@@ -8,7 +8,7 @@ def is_csv(file):
     '''
     if not file.endswith('.csv'):
         print("Insert a correct CSV file please.")
-        return
+        return False
     with open(file, newline='') as csvfile:
         try:
             csv.Sniffer().sniff(csvfile.read(1024))
