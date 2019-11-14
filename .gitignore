@@ -5,9 +5,12 @@ __pycache__/
 
 # C extensions
 *.so
+/executable
+module/Pipfile.lock
+module/.DS_Store
 
 # data
-graphic/data.csv
+assets/data.csv
 
 # Distribution / packaging
 .Python
