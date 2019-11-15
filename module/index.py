@@ -145,7 +145,7 @@ def cli():
     '''
 
 @cli.command('build')
-@click.argument('file')
+@click.argument('file', type=click.Path(exists=True))
 def build_graphic(file):
     '''
     Build Supply and Demand curve into a graph
