@@ -11,6 +11,7 @@ numpy = "*"
 click = "*"
 ipython = "*"
 pylint = "*"
+pyinstaller = "*"
 
 [requires]
 python_version = "3.7"
