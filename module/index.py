@@ -9,24 +9,23 @@ def is_csv(file):
     if not file.endswith('.csv'):
         print("Insert a correct CSV file please.")
         return False
-    with open(file, newline='') as csvfile:
-        try:
+    try:
+        with open(file, newline='') as csvfile:
             csv.Sniffer().sniff(csvfile.read(1024))
             csvfile.seek(0)
             return True
-        except csv.Error:
-            print("Insert a correct CSV file please.")
-            return False
-    return
+    except:
+        print("Insert a correct CSV file please.")
+        return False
 
-def set_equilibrium(data, quantityDemanded, quantitySupply, price):
+def set_equilibrium(data, quantity_demanded, quantity_supply, price):
     '''
     Check if the row correspond to the Equilibrium Price and Quantity
     '''
-    if (quantityDemanded.isdecimal() and quantitySupply.isdecimal() and
-            price.isdecimal() and (int(quantityDemanded) == int(quantitySupply))):
+    if (quantity_demanded.isdecimal() and quantity_supply.isdecimal() and
+            price.isdecimal() and (int(quantity_demanded) == int(quantity_supply))):
         data["equilibriumPrice"] = price
-        data["equilibriumQuantity"] = quantityDemanded
+        data["equilibriumQuantity"] = quantity_demanded
         return data
     return data
 
@@ -54,10 +53,10 @@ def fill_data(row, data):
     '''
     Fill and sort data inside the dictionnary
     '''
-    keys = {"price": 0, "quantityDemanded": 1, "quantitySupply": 2}
+    keys = {"price": 0, "quantity_demanded": 1, "quantity_supply": 2}
     for (key, value) in keys.items():
         data = set_data_by_row(row[value], key, data)
-    if data["equilibriumPrice"] == None:
+    if data["equilibriumPrice"] is None:
         data = set_equilibrium(data, row[1], row[2], row[0])
     del keys
     return data
@@ -66,12 +65,12 @@ def clean_row(row):
     '''
     Clean each row of any whitespace
     '''
-    newRow = []
+    new_row = []
     for item in row:
         item = item.strip()
-        newRow.append(item)
+        new_row.append(item)
     del row
-    return newRow
+    return new_row
 
 def init_data():
     '''
@@ -83,12 +82,12 @@ def init_data():
             "highest": None,
             "all": []
         },
-        "quantityDemanded": {
+        "quantity_demanded": {
             "lowest": None,
             "highest": None,
             "all": []
         },
-        "quantitySupply": {
+        "quantity_supply": {
             "lowest": None,
             "highest": None,
             "all": []
@@ -121,17 +120,17 @@ def display_results(data):
     print("The minimum price is {}$ and the maximum price is {}$."
           .format(data["price"]["lowest"], data["price"]["highest"]))
     print("The lowest quantity demanded is equal to {} and the highest quantity demanded is equal to {}."
-          .format(data["quantityDemanded"]["lowest"], data["quantityDemanded"]["highest"]))
+          .format(data["quantity_demanded"]["lowest"], data["quantity_demanded"]["highest"]))
     print("The lowest quantity supply is equal to {} and the highest quantity supply is equal to {}."
-          .format(data["quantitySupply"]["lowest"], data["quantitySupply"]["highest"]))
+          .format(data["quantity_supply"]["lowest"], data["quantity_supply"]["highest"]))
 
 def builder(file):
     '''
     Build the final graph and display the results
     '''
     data = get_data(file)
-    plt.plot(data["quantityDemanded"]["all"], data["price"]["all"])
-    plt.plot(data["quantitySupply"]["all"], data["price"]["all"])
+    plt.plot(data["quantity_demanded"]["all"], data["price"]["all"])
+    plt.plot(data["quantity_supply"]["all"], data["price"]["all"])
     plt.legend(["Demand", "Supply"])
     plt.ylabel("Price")
     plt.xlabel("Supply and Demand Quantity")
