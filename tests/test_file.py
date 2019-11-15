@@ -1,4 +1,6 @@
 import unittest
+import sys
+sys.path.append('../module')
 from index import is_csv
 
 class TestFile(unittest.TestCase):
