@@ -24,6 +24,13 @@ pipenv install
 pipenv run python3 index.py
 ```
 
+## Example
+
+<p align="center">
+  <img src="assets/cli-illustration.png" width="650">
+  <img src="assets/graph-illustration.png" width="650">
+</p>
+
 ## Executable
 
 If you want to build a cross-platform executable, you need to execute the following bash commands :
