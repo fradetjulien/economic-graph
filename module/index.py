@@ -1,33 +1,23 @@
+'''
+Graphic for a demand supply schedule
+'''
 import csv
+import os
 import click
 from matplotlib import pyplot as plt
 
-def is_csv(file):
+def display_results(data):
     '''
-    Check if the file received in parameter is a correct CSV file
+    Display the founded results in the console
     '''
-    if not file.endswith('.csv'):
-        print("Insert a correct CSV file please.")
-        return False
-    try:
-        with open(file, newline='') as csvfile:
-            csv.Sniffer().sniff(csvfile.read(1024))
-            csvfile.seek(0)
-            return True
-    except:
-        print("Insert a correct CSV file please.")
-        return False
-
-def set_equilibrium(data, quantity_demanded, quantity_supply, price):
-    '''
-    Check if the row correspond to the Equilibrium Price and Quantity
-    '''
-    if (quantity_demanded.isdecimal() and quantity_supply.isdecimal() and
-            price.isdecimal() and (int(quantity_demanded) == int(quantity_supply))):
-        data["equilibriumPrice"] = price
-        data["equilibriumQuantity"] = quantity_demanded
-        return data
-    return data
+    print("The equilibrium price is equal to ${} and the equilibrium quantity is equal to {}."
+          .format(data["equilibriumPrice"], data["equilibriumQuantity"]))
+    print("The minimum price is ${} and the maximum price is ${}."
+          .format(data["price"]["lowest"], data["price"]["highest"]))
+    print("The lowest quantity demanded is equal to {} and the highest quantity demanded is equal to {}."
+          .format(data["quantity_demanded"]["lowest"], data["quantity_demanded"]["highest"]))
+    print("The lowest quantity supply is equal to {} and the highest quantity supply is equal to {}."
+          .format(data["quantity_supply"]["lowest"], data["quantity_supply"]["highest"]))
 
 def set_min_and_max_values(key, data):
     '''
@@ -38,6 +28,17 @@ def set_min_and_max_values(key, data):
             data[key]["lowest"] = min(data[key]["all"])
             data[key]["highest"] = max(data[key]["all"])
     except:
+        return data
+    return data
+
+def set_equilibrium(data, quantity_demanded, quantity_supply, price):
+    '''
+    Check if the row correspond to the Equilibrium Price and Quantity
+    '''
+    if (quantity_demanded.isdecimal() and quantity_supply.isdecimal() and
+            price.isdecimal() and (int(quantity_demanded) == int(quantity_supply))):
+        data["equilibriumPrice"] = price
+        data["equilibriumQuantity"] = quantity_demanded
         return data
     return data
 
@@ -111,32 +112,34 @@ def get_data(file):
         data = set_min_and_max_values(key, data)
     return data
 
-def display_results(data):
-    '''
-    Display the founded results in the console
-    '''
-    print("The equilibrium price is equal to {} and the equilibrium quantity is equal to {}."
-          .format(data["equilibriumPrice"], data["equilibriumQuantity"]))
-    print("The minimum price is {}$ and the maximum price is {}$."
-          .format(data["price"]["lowest"], data["price"]["highest"]))
-    print("The lowest quantity demanded is equal to {} and the highest quantity demanded is equal to {}."
-          .format(data["quantity_demanded"]["lowest"], data["quantity_demanded"]["highest"]))
-    print("The lowest quantity supply is equal to {} and the highest quantity supply is equal to {}."
-          .format(data["quantity_supply"]["lowest"], data["quantity_supply"]["highest"]))
-
 def builder(file):
     '''
     Build the final graph and display the results
     '''
     data = get_data(file)
-    plt.plot(data["quantity_demanded"]["all"], data["price"]["all"])
-    plt.plot(data["quantity_supply"]["all"], data["price"]["all"])
-    plt.legend(["Demand", "Supply"])
-    plt.ylabel("Price")
-    plt.xlabel("Supply and Demand Quantity")
-    plt.suptitle("Demand and Supply schedule")
-    display_results(data)
-    plt.show()
+    try:
+        if data["quantity_demanded"]["all"] and data["price"]["all"] and\
+            data["quantity_supply"]["all"] and data["price"]["all"]:
+            plt.plot(data["quantity_demanded"]["all"], data["price"]["all"])
+            plt.plot(data["quantity_supply"]["all"], data["price"]["all"])
+            plt.grid(True)
+            plt.legend(["Demand", "Supply"])
+            plt.ylabel("Price")
+            plt.xlabel("Supply and Demand Quantity")
+            plt.title("Demand and Supply schedule")
+            display_results(data)
+            plt.show()
+    except KeyError:
+        print("Sorry, unable to create the graphic.")
+
+def is_csv(file):
+    '''
+    Check if the file received in parameter is a correct CSV file
+    '''
+    if not file.endswith('.csv') or os.path.getsize(file) <= 0:
+        print("Insert a correct CSV file please.")
+        return False
+    return True
 
 @click.group()
 def cli():
