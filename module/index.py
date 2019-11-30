@@ -103,11 +103,17 @@ def get_data(file):
     Open and read the data inside the CSV file
     '''
     data = init_data()
-    with open(file, newline='') as csvfile:
+    with open(file, mode='r', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
-        for row in reader:
-            row = clean_row(row)
-            data = fill_data(row, data)
+        try:
+            for row in reader:
+                row = clean_row(row)
+                data = fill_data(row, data)
+        except csv.Error:
+            print("Unable to read the CSV file.")
+            return None
+        finally:
+            del reader
     for key in data.keys():
         data = set_min_and_max_values(key, data)
     return data
